@@ -1,16 +1,16 @@
 # RUN docker-compose build && docker-compose up
 # http://localhost/docs (or reconfigure the compose if you need to!)
 
-from typing import List
+from typing import Any, Dict, List
 import uuid
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
-from server.db.init.setup import db_init
+from server.db.db import get_db
 from server.db.models.test_model import TestData, TestModel
 
 # rate limiting w slow-api: https://stackoverflow.com/questions/65491184/ratelimit-in-fastapi
@@ -19,9 +19,6 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-engine = db_init()
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 @app.get("/")
 async def read_root():
@@ -29,9 +26,8 @@ async def read_root():
 
 
 @app.post("/test")
-async def test_endpoint(name: str):
-    db_session = SessionLocal()
-
+async def test_endpoint(
+    name: str, db_session: Session = Depends(get_db)) -> Dict[str, Any]:
     try:
         # unpack the payload, create and add UID
         uid = str(uuid.uuid4())
@@ -53,10 +49,9 @@ async def test_endpoint(name: str):
 
 @app.get("/getnames", response_model=List[TestData])
 @limiter.limit("10/minute")  # slowapi limiter example
-async def get_names(
-    request: Request
-):  # NOTE SlowAPI requires the request param, even if unused otherwise.
-    db_session = SessionLocal()
+async def get_names(  # NOTE SlowAPI requires the request param, even if unused otherwise.
+    request: Request,
+    db_session: Session = Depends(get_db)) -> List[Dict[str, str]]:
     all_data = db_session.query(TestModel).all()
 
     if not all_data:

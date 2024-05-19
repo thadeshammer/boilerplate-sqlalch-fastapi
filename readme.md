@@ -15,6 +15,8 @@ There are only two VERY simple endpoints in this example.
 * `/test` takes a string 'name' and sticks it into the DB along with a generated UUID.
 * `/getnames` will spit out everything in that table.
 
+**NOTE the DB is not persisted outside of its container** so if you destroy/rebuild the container, that data is gone. If you don't want that, you'll need to mount a volume for it.
+
 ## What's Inside
 
 ### Docker

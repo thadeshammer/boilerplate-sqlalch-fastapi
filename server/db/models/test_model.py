@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, DateTime, Numeric
 
-from server.db.common import Base
+from server.db.db import Base
 
 
 class TestModel(Base):  # type: ignore
