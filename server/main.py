@@ -11,7 +11,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from server.db import get_db
-from server.db.models.test_model import TestData, TestModel
+from server.db.models import TestData, TestModel
 
 # rate limiting w slow-api: https://stackoverflow.com/questions/65491184/ratelimit-in-fastapi
 limiter = Limiter(key_func=get_remote_address)

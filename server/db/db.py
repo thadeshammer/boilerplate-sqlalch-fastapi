@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 from server.db.base import Base
-from server.db.models.test_model import TestModel
+from server.db.models import TestModel
 
 # TODO home these constants in configuration
 DATABASE_URL = URL(drivername="postgresql",
