@@ -1,15 +1,19 @@
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, DateTime, Numeric
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import Mapped
 
-from server.db.db import Base
+from server.db import Base
 
 
 class TestModel(Base):  # type: ignore
     __tablename__ = 'test_table'
 
-    id: int = Column(Integer, primary_key=True)
-    uid: str = Column(String, unique=True)
-    name: str = Column(String)
+    id: Mapped[int] = Column(Integer,
+                             primary_key=True,
+                             autoincrement=True,
+                             index=True)
+    uid: Mapped[str] = Column(String, unique=True)
+    name: Mapped[str] = Column(String, index=True)
 
 
 class TestData(BaseModel):
